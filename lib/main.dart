@@ -1,11 +1,13 @@
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_netflix/firebase_options.dart';
+import 'package:flutter_netflix/provider/provider.dart';
 import 'package:flutter_netflix/screen/home_screen.dart';
 import 'package:flutter_netflix/screen/like_screen.dart';
 import 'package:flutter_netflix/screen/more_screen.dart';
 import 'package:flutter_netflix/screen/search_screen.dart';
 import 'package:flutter_netflix/widget/bottom_bar.dart';
+import 'package:provider/provider.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -15,12 +17,7 @@ void main() async {
   runApp(MyApp());
 }
 
-class MyApp extends StatefulWidget {
-  _MyAppState createState() => _MyAppState();
-}
-
-class _MyAppState extends State<MyApp> {
-  TabController? controller;
+class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
@@ -29,19 +26,22 @@ class _MyAppState extends State<MyApp> {
         brightness: Brightness.dark,
         primaryColor: Colors.black,
       ),
-      home: DefaultTabController(
-        length: 4,
-        child: Scaffold(
-          body: TabBarView(
-            physics: NeverScrollableScrollPhysics(),
-            children: <Widget>[
-              HomeScreen(),
-              SearchScreen(),
-              LikeScreen(),
-              MoreScreen(),
-            ],
+      home: ChangeNotifierProvider(
+        create: (_) => MovieProvider(),
+        child: DefaultTabController(
+          length: 4,
+          child: Scaffold(
+            body: TabBarView(
+              physics: NeverScrollableScrollPhysics(),
+              children: <Widget>[
+                HomeScreen(),
+                SearchScreen(),
+                LikeScreen(),
+                MoreScreen(),
+              ],
+            ),
+            bottomNavigationBar: Bottom(),
           ),
-          bottomNavigationBar: Bottom(),
         ),
       ),
     );

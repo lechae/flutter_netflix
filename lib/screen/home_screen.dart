@@ -1,58 +1,41 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_netflix/model/model_movie.dart';
+import 'package:flutter_netflix/provider/provider.dart';
 import 'package:flutter_netflix/widget/box_slider.dart';
 import 'package:flutter_netflix/widget/carousel_slider.dart';
 import 'package:flutter_netflix/widget/circle_slider.dart';
+import 'package:provider/provider.dart';
 
-class HomeScreen extends StatefulWidget {
-  _HomeScreenState createState() => _HomeScreenState();
-}
-
-class _HomeScreenState extends State<HomeScreen> {
-  FirebaseFirestore firestore = FirebaseFirestore.instance;
-  Stream<QuerySnapshot>? streamData;
-
-  @override
-  void initState() {
-    super.initState();
-    streamData = firestore.collection('movie').snapshots();
-  }
-
-  Widget _fetchData(BuildContext context) {
-    return StreamBuilder(
-      stream: FirebaseFirestore.instance.collection('movie').snapshots(),
-      builder: (context, snapshot) {
-        if (!snapshot.hasData) return LinearProgressIndicator();
-        return _buildBody(context, snapshot.data!.docs);
-      },
-    );
-  }
-
-  Widget _buildBody(BuildContext context, List<DocumentSnapshot> snapshot) {
-    List<Movie> movies = snapshot.map((e) => Movie.fromSnapshot(e)).toList();
-
-    return ListView(
-      children: <Widget>[
-        Stack(
-          children: <Widget>[
-            CarouselImage(movies: movies),
-            TopBar(),
-          ],
-        ),
-        CircleSlider(
-          movies: movies,
-        ),
-        BoxSlider(
-          movies: movies,
-        ),
-      ],
-    );
-  }
-
+class HomeScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    return _fetchData(context);
+    final _movieProvider = Provider.of<MovieProvider>(context);
+    return FutureBuilder(
+      future: _movieProvider.fetchMovieData(),
+      builder: (context, snapshots) {
+        if (_movieProvider.movies.isEmpty) {
+          return Center(
+            child: CircularProgressIndicator(),
+          );
+        } else {
+          return ListView(
+            children: <Widget>[
+              Stack(
+                children: <Widget>[
+                  CarouselImage(provider: _movieProvider),
+                  TopBar(),
+                ],
+              ),
+              CircleSlider(
+                movies: _movieProvider.movies,
+              ),
+              BoxSlider(
+                movies: _movieProvider.movies,
+              ),
+            ],
+          );
+        }
+      },
+    );
   }
 }
 

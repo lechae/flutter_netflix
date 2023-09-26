@@ -1,11 +1,12 @@
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_netflix/model/model_movie.dart';
+import 'package:flutter_netflix/provider/provider.dart';
 import 'package:flutter_netflix/screen/detail_screen.dart';
 
 class CarouselImage extends StatefulWidget {
-  final List<Movie>? movies;
-  CarouselImage({this.movies});
+  final MovieProvider? provider;
+  CarouselImage({this.provider});
   _CarouselImageState createState() => _CarouselImageState();
 }
 
@@ -23,7 +24,7 @@ class _CarouselImageState extends State<CarouselImage> {
   @override
   void initState() {
     super.initState();
-    movies = widget.movies;
+    movies = widget.provider!.movies;
     images = movies!.map((e) => Image.network(e.poster)).toList();
     keywords = movies!.map((e) => e.keyword).toList();
     makers = movies!.map((e) => e.maker).toList();
@@ -70,9 +71,8 @@ class _CarouselImageState extends State<CarouselImage> {
                               onPressed: () {
                                 setState(() {
                                   likes![_currentPage] = !likes![_currentPage];
-                                  movies![_currentPage]
-                                      .reference!
-                                      .update({'like': likes![_currentPage]});
+                                  widget.provider!.updateMovieInfo(
+                                      _currentPage, likes![_currentPage]);
                                 });
                               },
                               icon: Icon(
@@ -84,9 +84,8 @@ class _CarouselImageState extends State<CarouselImage> {
                               onPressed: () {
                                 setState(() {
                                   likes![_currentPage] = !likes![_currentPage];
-                                  movies![_currentPage]
-                                      .reference!
-                                      .update({'like': likes![_currentPage]});
+                                  widget.provider!.updateMovieInfo(
+                                      _currentPage, likes![_currentPage]);
                                 });
                               },
                               icon: Icon(
